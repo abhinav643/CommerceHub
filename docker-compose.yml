@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: commercehub-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: commercehub
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: commercehub-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: commercehub-api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      Mongo__ConnectionString: mongodb://mongo:27017
+      Mongo__Database: commercehub
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
+      RabbitMq__Exchange: commercehub.events
+      RabbitMq__RoutingKey: orders.created
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+      - rabbitmq
+
+volumes:
+  mongo_data:
