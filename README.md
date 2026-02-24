@@ -50,6 +50,36 @@ OrderCreated events are published only after successful order creation.
 
 ---
 
+## Verify Event Emission (RabbitMQ)
+
+After running the system and performing a checkout:
+
+1. Open RabbitMQ UI:  
+   http://localhost:15672  
+   Login: guest / guest  
+
+2. Create a queue:  
+   - Name: orders.created.q  
+   - Durable: checked  
+
+3. Bind the queue:  
+   - Exchange: commercehub.events  
+   - Routing key: orders.created  
+
+4. Perform a checkout via Swagger.
+
+5. Open the queue and click “Get Messages”.  
+   You should see JSON like:
+
+{
+  "OrderId": "...",
+  "CustomerId": "...",
+  "Total": ...
+}
+
+This confirms successful event emission.
+
+---
 ## Unit Testing
 
 nUnit tests cover:
