@@ -55,6 +55,15 @@ AI-generated repository logic assumed strongly typed field mappings, but the see
 
 I fixed this by registering MongoDB camelCase conventions so that the C# models and database documents used consistent field naming, which restored correct update behavior.
 
+
+### 5. Fixing Invalid ID Handling to Prevent 500 Errors
+
+The AI-generated controller code used `ObjectId.Parse` directly when reading order IDs. I noticed during manual API testing that this would throw an exception if an invalid or malformed ID was provided, resulting in a 500 Internal Server Error.
+
+I corrected this by switching to `ObjectId.TryParse` and adding proper validation checks. Now, invalid ID formats return a 400 Bad Request response, while valid but non-existent IDs correctly return a 404 Not Found.
+
+This change prevented unnecessary server errors and ensured the API returned appropriate client-friendly responses for invalid input.
+
 ---
 
 ## Verification Using AI
@@ -70,4 +79,5 @@ With AI assistance, I created test scenarios such as:
 All AI-generated test suggestions were reviewed manually to ensure they matched the actual business logic and concurrency behavior of the system.
 
 The final test suite covers both successful flows and failure scenarios, helping confirm that the system behaves correctly under edge cases and maintains data consistency.
+
 
